@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1200" height="1800" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .entity {
+            fill: #f5f5f5;
+            stroke: #333;
+            stroke-width: 2;
+        }
+        .entity-title {
+            fill: #4a86e8;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .entity-attribute {
+            fill: #333;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+        .primary-key {
+            font-weight: bold;
+        }
+        .foreign-key {
+            fill: #6aa84f;
+        }
+        .relationship {
+            stroke: #333;
+            stroke-width: 1.5;
+            fill: none;
+        }
+        .cardinality {
+            fill: #333;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+        .section-title {
+            fill: #333;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .subsection-title {
+            fill: #666;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .fts-entity {
+            fill: #e6f2ff;
+            stroke: #333;
+            stroke-width: 2;
+        }
+        .junction-entity {
+            fill: #fff2cc;
+            stroke: #333;
+            stroke-width: 2;
+        }
+        .group-box {
+            fill: none;
+            stroke: #999;
+            stroke-width: 1;
+            stroke-dasharray: 5,5;
+        }
+        .group-label {
+            fill: #666;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-style: italic;
+        }
+    </style>
+
+    <!-- Title -->
+    <text x="600" y="30" text-anchor="middle" class="section-title">JMDict and Kanjidic2 Database Schema</text>
+    
+    <!-- JMDict Section Title -->
+    <text x="300" y="60" class="section-title">JMDict Tables</text>
+    
+    <!-- Core Tables Group Box -->
+    <rect x="30" y="80" width="540" height="380" rx="5" ry="5" class="group-box" />
+    <text x="50" y="100" class="group-label">Core Tables</text>
+    
+    <!-- jmdict_entries -->
+    <rect x="50" y="120" width="200" height="70" rx="5" ry="5" class="entity" />
+    <text x="150" y="140" text-anchor="middle" class="entity-title">jmdict_entries</text>
+    <line x1="50" y1="150" x2="250" y2="150" stroke="#333" stroke-width="1" />
+    <text x="60" y="170" class="entity-attribute primary-key">id (TEXT) PK</text>
+    <text x="60" y="185" class="entity-attribute">entry_sequence (INTEGER)</text>
+    
+    <!-- jmdict_kanji -->
+    <rect x="50" y="240" width="200" height="100" rx="5" ry="5" class="entity" />
+    <text x="150" y="260" text-anchor="middle" class="entity-title">jmdict_kanji</text>
+    <line x1="50" y1="270" x2="250" y2="270" stroke="#333" stroke-width="1" />
+    <text x="60" y="290" class="entity-attribute primary-key">id (INTEGER) PK</text>
+    <text x="60" y="305" class="entity-attribute foreign-key">entry_id (TEXT) FK</text>
+    <text x="60" y="320" class="entity-attribute">text (TEXT)</text>
+    <text x="60" y="335" class="entity-attribute">common (BOOLEAN)</text>
+    
+    <!-- jmdict_kana -->
+    <rect x="50" y="350" width="200" height="100" rx="5" ry="5" class="entity" />
+    <text x="150" y="370" text-anchor="middle" class="entity-title">jmdict_kana</text>
+    <line x1="50" y1="380" x2="250" y2="380" stroke="#333" stroke-width="1" />
+    <text x="60" y="400" class="entity-attribute primary-key">id (INTEGER) PK</text>
+    <text x="60" y="415" class="entity-attribute foreign-key">entry_id (TEXT) FK</text>
+    <text x="60" y="430" class="entity-attribute">text (TEXT)</text>
+    <text x="60" y="445" class="entity-attribute">common (BOOLEAN)</text>
+    
+    <!-- jmdict_sense -->
+    <rect x="350" y="120" width="200" height="70" rx="5" ry="5" class="entity" />
+    <text x="450" y="140" text-anchor="middle" class="entity-title">jmdict_sense</text>
+    <line x1="350" y1="150" x2="550" y2="150" stroke="#333" stroke-width="1" />
+    <text x="360" y="170" class="entity-attribute primary-key">id (INTEGER) PK</text>
+    <text x="360" y="185" class="entity-attribute foreign-key">entry_id (TEXT) FK</text>
+    
+    <!-- jmdict_gloss -->
+    <rect x="350" y="240" width="200" height="130" rx="5" ry="5" class="entity" />
+    <text x="450" y="260" text-anchor="middle" class="entity-title">jmdict_gloss</text>
+    <line x1="350" y1="270" x2="550" y2="270" stroke="#333" stroke-width="1" />
+    <text x="360" y="290" class="entity-attribute primary-key">id (INTEGER) PK</text>
+    <text x="360" y="305" class="entity-attribute foreign-key">sense_id (INTEGER) FK</text>
+    <text x="360" y="320" class="entity-attribute">text (TEXT)</text>
+    <text x="360" y="335" class="entity-attribute">lang (TEXT)</text>
+    <text x="360" y="350" class="entity-attribute">gender (TEXT)</text>
+    <text x="360" y="365" class="entity-attribute">type (TEXT)</text>
+    
+    <!-- FTS Tables Group Box -->
+    <rect x="30" y="470" width="250" height="180" rx="5" ry="5" class="group-box" />
+    <text x="50" y="490" class="group-label">Full-Text Search Tables</text>
+    
+    <!-- jmdict_gloss_fts -->
+    <rect x="50" y="510" width="200" height="70" rx="5" ry="5" class="fts-entity" />
+    <text x="150" y="530" text-anchor="middle" class="entity-title">jmdict_gloss_fts</text>
+    <line x1="50" y1="540" x2="250" y2="540" stroke="#333" stroke-width="1" />
+    <text x="60" y="560" class="entity-attribute">text (TEXT)</text>
+    <text x="60" y="575" class="entity-attribute">(Virtual FTS5 Table)</text>
+    
+    <!-- FTS Support Tables -->
+    <rect x="50" y="590" width="200" height="50" rx="5" ry="5" class="fts-entity" />
+    <text x="150" y="610" text-anchor="middle" class="entity-title">FTS Support Tables</text>
+    <line x1="50" y1="620" x2="250" y2="620" stroke="#333" stroke-width="1" />
+    <text x="60" y="635" class="entity-attribute">_config, _data, _idx, _docsize</text>
+    
+    <!-- Tags and Junction Tables Group Box -->
+    <rect x="290" y="470" width="280" height="400" rx="5" ry="5" class="group-box" />
+    <text x="310" y="490" class="group-label">Tags and Junction Tables</text>
+    
+    <!-- tags -->
+    <rect x="330" y="510" width="200" height="100" rx="5" ry="5" class="entity" />
+    <text x="430" y="530" text-anchor="middle" class="entity-title">tags</text>
+    <line x1="330" y1="540" x2="530" y2="540" stroke="#333" stroke-width="1" />
+    <text x="340" y="560" class="entity-attribute primary-key">id (INTEGER) PK</text>
+    <text x="340" y="575" class="entity-attribute">tag (TEXT)</text>
+    <text x="340" y="590" class="entity-attribute">description (TEXT)</text>
+    <text x="340" y="605" class="entity-attribute">category (TEXT)</text>
+    
+    <!-- Tag Junction Tables -->
+    <rect x="330" y="620" width="200" height="150" rx="5" ry="5" class="junction-entity" />
+    <text x="430" y="640" text-anchor="middle" class="entity-title">Tag Junction Tables</text>
+    <line x1="330" y1="650" x2="530" y2="650" stroke="#333" stroke-width="1" />
+    <text x="340" y="670" class="entity-attribute">jmdict_kanji_tags</text>
+    <text x="340" y="685" class="entity-attribute">jmdict_kana_tags</text>
+    <text x="340" y="700" class="entity-attribute">jmdict_sense_pos</text>
+    <text x="340" y="715" class="entity-attribute">jmdict_sense_field</text>
+    <text x="340" y="730" class="entity-attribute">jmdict_sense_misc</text>
+    <text x="340" y="745" class="entity-attribute">jmdict_sense_dialect</text>
+    
+    <!-- Relationship Tables Group Box -->
+    <rect x="580" y="80" width="280" height="300" rx="5" ry="5" class="group-box" />
+    <text x="600" y="100" class="group-label">Relationship Tables</text>
+    
+    <!-- jmdict_kana_to_kanji -->
+    <rect x="620" y="120" width="200" height="70" rx="5" ry="5" class="junction-entity" />
+    <text x="720" y="140" text-anchor="middle" class="entity-title">jmdict_kana_to_kanji</text>
+    <line x1="620" y1="150" x2="820" y2="150" stroke="#333" stroke-width="1" />
+    <text x="630" y="170" class="entity-attribute foreign-key">kana_id (INTEGER) FK</text>
+    <text x="630" y="185" class="entity-attribute">kanji_text (TEXT)</text>
+    
+    <!-- sense applies tables -->
+    <rect x="620" y="200" width="200" height="120" rx="5" ry="5" class="junction-entity" />
+    <text x="720" y="220" text-anchor="middle" class="entity-title">sense_applies_to_*</text>
+    <line x1="620" y1="230" x2="820" y2="230" stroke="#333" stroke-width="1" />
+    <text x="630" y="250" class="entity-attribute foreign-key">sense_id (INTEGER) FK</text>
+    <text x="630" y="265" class="entity-attribute">kanji_text/kana_text (TEXT)</text>
+    <text x="630" y="280" class="entity-attribute">jmdict_sense_applies_to_kanji</text>
+    <text x="630" y="295" class="entity-attribute">jmdict_sense_applies_to_kana</text>
+    
+    <!-- Additional JMDict Tables -->
+    <rect x="620" y="330" width="200" height="90" rx="5" ry="5" class="entity" />
+    <text x="720" y="350" text-anchor="middle" class="entity-title">Additional Tables</text>
+    <line x1="620" y1="360" x2="820" y2="360" stroke="#333" stroke-width="1" />
+    <text x="630" y="380" class="entity-attribute">jmdict_language_source</text>
+    <text x="630" y="395" class="entity-attribute">jmdict_sense_info</text>
+    <text x="630" y="410" class="entity-attribute">jmdict_xrefs</text>
+    
+    <!-- Kanjidic Section Title -->
+    <text x="600" y="500" class="section-title">Kanjidic2 Tables</text>
+    
+    <!-- Kanjidic Core Tables Group Box -->
+    <rect x="580" y="520" width="540" height="380" rx="5" ry="5" class="group-box" />
+    <text x="600" y="540" class="group-label">Core Tables</text>
+    
+    <!-- kanjidic_characters -->
+    <rect x="600" y="560" width="200" height="115" rx="5" ry="5" class="entity" />
+    <text x="700" y="580" text-anchor="middle" class="entity-title">kanjidic_characters</text>
+    <line x1="600" y1="590" x2="800" y2="590" stroke="#333" stroke-width="1" />
+    <text x="610" y="610" class="entity-attribute primary-key">literal (TEXT) PK</text>
+    <text x="610" y="625" class="entity-attribute">grade (INTEGER)</text>
+    <text x="610" y="640" class="entity-attribute">stroke_count (INTEGER)</text>
+    <text x="610" y="655" class="entity-attribute">frequency (INTEGER)</text>
+    <text x="610" y="670" class="entity-attribute">jlpt_level (INTEGER)</text>
+    
+    <!-- kanjidic_readings -->
+    <rect x="600" y="685" width="200" height="100" rx="5" ry="5" class="entity" />
+    <text x="700" y="705" text-anchor="middle" class="entity-title">kanjidic_readings</text>
+    <line x1="600" y1="715" x2="800" y2="715" stroke="#333" stroke-width="1" />
+    <text x="610" y="735" class="entity-attribute primary-key">id (INTEGER) PK</text>
+    <text x="610" y="750" class="entity-attribute foreign-key">character (TEXT) FK</text>
+    <text x="610" y="765" class="entity-attribute">type (TEXT)</text>
+    <text x="610" y="780" class="entity-attribute">value (TEXT)</text>
+    
+    <!-- kanjidic_meanings -->
+    <rect x="600" y="795" width="200" height="100" rx="5" ry="5" class="entity" />
+    <text x="700" y="815" text-anchor="middle" class="entity-title">kanjidic_meanings</text>
+    <line x1="600" y1="825" x2="800" y2="825" stroke="#333" stroke-width="1" />
+    <text x="610" y="845" class="entity-attribute primary-key">id (INTEGER) PK</text>
+    <text x="610" y="860" class="entity-attribute foreign-key">character (TEXT) FK</text>
+    <text x="610" y="875" class="entity-attribute">lang (TEXT)</text>
+    <text x="610" y="890" class="entity-attribute">value (TEXT)</text>
+    
+    <!-- kanjidic_radicals -->
+    <rect x="900" y="560" width="200" height="90" rx="5" ry="5" class="entity" />
+    <text x="1000" y="580" text-anchor="middle" class="entity-title">kanjidic_radicals</text>
+    <line x1="900" y1="590" x2="1100" y2="590" stroke="#333" stroke-width="1" />
+    <text x="910" y="610" class="entity-attribute primary-key">id (INTEGER) PK</text>
+    <text x="910" y="625" class="entity-attribute foreign-key">character (TEXT) FK</text>
+    <text x="910" y="640" class="entity-attribute">type (TEXT)</text>
+    <text x="910" y="655" class="entity-attribute">value (INTEGER)</text>
+    
+    <!-- Additional Kanjidic Tables -->
+    <rect x="900" y="660" width="200" height="150" rx="5" ry="5" class="entity" />
+    <text x="1000" y="680" text-anchor="middle" class="entity-title">Additional Tables</text>
+    <line x1="900" y1="690" x2="1100" y2="690" stroke="#333" stroke-width="1" />
+    <text x="910" y="710" class="entity-attribute">kanjidic_codepoints</text>
+    <text x="910" y="725" class="entity-attribute">kanjidic_variants</text>
+    <text x="910" y="740" class="entity-attribute">kanjidic_dict_references</text>
+    <text x="910" y="755" class="entity-attribute">kanjidic_query_codes</text>
+    <text x="910" y="770" class="entity-attribute">kanjidic_radical_names</text>
+    <text x="910" y="785" class="entity-attribute">kanjidic_nanori</text>
+    
+    <!-- Kanjidic FTS Tables Group Box -->
+    <rect x="900" y="820" width="220" height="80" rx="5" ry="5" class="group-box" />
+    <text x="920" y="840" class="group-label">Full-Text Search Tables</text>
+    
+    <!-- kanjidic_meanings_fts -->
+    <rect x="910" y="850" width="200" height="70" rx="5" ry="5" class="fts-entity" />
+    <text x="1010" y="870" text-anchor="middle" class="entity-title">kanjidic_meanings_fts</text>
+    <line x1="910" y1="880" x2="1110" y2="880" stroke="#333" stroke-width="1" />
+    <text x="920" y="900" class="entity-attribute">value (TEXT)</text>
+    <text x="920" y="915" class="entity-attribute">(Virtual FTS5 Table)</text>
+    
+    <!-- Relationships -->
+    <!-- jmdict_entries to jmdict_kanji -->
+    <path d="M 150,190 L 150,240" class="relationship" />
+    <text x="140" y="215" class="cardinality">1</text>
+    <text x="160" y="215" class="cardinality">*</text>
+    
+    <!-- jmdict_entries to jmdict_kana -->
+    <path d="M 150,190 L 150,350" class="relationship" />
+    <text x="140" y="340" class="cardinality">1</text>
+    <text x="160" y="340" class="cardinality">*</text>
+    
+    <!-- jmdict_entries to jmdict_sense -->
+    <path d="M 250,155 L 350,155" class="relationship" />
+    <text x="260" y="145" class="cardinality">1</text>
+    <text x="340" y="145" class="cardinality">*</text>
+    
+    <!-- jmdict_sense to jmdict_gloss -->
+    <path d="M 450,190 L 450,240" class="relationship" />
+    <text x="440" y="215" class="cardinality">1</text>
+    <text x="460" y="215" class="cardinality">*</text>
+    
+    <!-- jmdict_gloss to jmdict_gloss_fts -->
+    <path d="M 450,370 L 450,450 L 150,450 L 150,510" class="relationship" stroke-dasharray="5,5" />
+    <text x="140" y="500" class="cardinality">1</text>
+    <text x="160" y="500" class="cardinality">1</text>
+    
+    <!-- jmdict_gloss_fts to FTS Support Tables -->
+    <path d="M 150,580 L 150,590" class="relationship" stroke-dasharray="5,5" />
+    
+    <!-- jmdict_kana to jmdict_kana_to_kanji -->
+    <path d="M 250,400 L 550,400 L 550,155 L 620,155" class="relationship" />
+    <text x="610" y="145" class="cardinality">*</text>
+    <text x="260" y="390" class="cardinality">1</text>
+    
+    <!-- jmdict_sense to sense_applies_to_* -->
+    <path d="M 550,155 L 585,155 L 585,250 L 620,250" class="relationship" />
+    <text x="610" y="240" class="cardinality">*</text>
+    <text x="560" y="145" class="cardinality">1</text>
+    
+    <!-- tags to Tag Junction Tables -->
+    <path d="M 430,610 L 430,620" class="relationship" />
+    <text x="420" y="615" class="cardinality">1</text>
+    <text x="440" y="615" class="cardinality">*</text>
+    
+    <!-- jmdict_sense to Additional Tables -->
+    <path d="M 550,170 L 585,170 L 585,380 L 620,380" class="relationship" />
+    <text x="610" y="370" class="cardinality">*</text>
+    <text x="560" y="160" class="cardinality">1</text>
+    
+    <!-- kanjidic_characters to kanjidic_readings -->
+    <path d="M 700,675 L 700,685" class="relationship" />
+    <text x="690" y="680" class="cardinality">1</text>
+    <text x="710" y="680" class="cardinality">*</text>
+    
+    <!-- kanjidic_characters to kanjidic_meanings -->
+    <path d="M 700,785 L 700,795" class="relationship" />
+    <text x="690" y="790" class="cardinality">1</text>
+    <text x="710" y="790" class="cardinality">*</text>
+    
+    <!-- kanjidic_meanings to kanjidic_meanings_fts -->
+    <path d="M 800,845 L 855,845 L 855,885 L 910,885" class="relationship" stroke-dasharray="5,5" />
+    <text x="900" y="875" class="cardinality">1</text>
+    <text x="900" y="895" class="cardinality">1</text>
+    
+    <!-- kanjidic_characters to kanjidic_radicals -->
+    <path d="M 800,615 L 900,615" class="relationship" />
+    <text x="810" y="605" class="cardinality">1</text>
+    <text x="890" y="605" class="cardinality">*</text>
+    
+    <!-- kanjidic_characters to Additional Tables -->
+    <path d="M 800,635 L 850,635 L 850,735 L 900,735" class="relationship" />
+    <text x="810" y="625" class="cardinality">1</text>
+    <text x="890" y="725" class="cardinality">*</text>
+    
+    <!-- Legend -->
+    <rect x="50" y="950" width="1100" height="220" rx="5" ry="5" fill="#f9f9f9" stroke="#333" stroke-width="1" />
+    <text x="550" y="970" text-anchor="middle" class="section-title">Legend</text>
+    
+    <rect x="100" y="990" width="20" height="20" fill="#f5f5f5" stroke="#333" stroke-width="2" />
+    <text x="130" y="1005" class="entity-attribute">Core Entity Table</text>
+    
+    <rect x="300" y="990" width="20" height="20" fill="#e6f2ff" stroke="#333" stroke-width="2" />
+    <text x="330" y="1005" class="entity-attribute">Full-Text Search Table</text>
+    
+    <rect x="500" y="990" width="20" height="20" fill="#fff2cc" stroke="#333" stroke-width="2" />
+    <text x="530" y="1005" class="entity-attribute">Junction/Relationship Table</text>
+    
+    <rect x="700" y="990" width="20" height="20" fill="none" stroke="#999" stroke-width="1" stroke-dasharray="5,5" />
+    <text x="730" y="1005" class="entity-attribute">Logical Grouping</text>
+    
+    <text x="100" y="1035" class="entity-attribute primary-key">Primary Key (PK)</text>
+    
+    <text x="300" y="1035" class="entity-attribute foreign-key">Foreign Key (FK)</text>
+    
+    <line x1="500" y1="1030" x2="550" y2="1030" class="relationship" />
+    <text x="560" y="1035" class="entity-attribute">One-to-Many Relationship</text>
+    
+    <line x1="700" y1="1030" x2="750" y2="1030" class="relationship" stroke-dasharray="5,5" />
+    <text x="760" y="1035" class="entity-attribute">Virtual Table Relationship</text>
+    
+    <text x="100" y="1065" class="entity-attribute">* The diagram shows the main tables and relationships. Some auxiliary tables are grouped for clarity.</text>
+    <text x="100" y="1105" class="entity-attribute">* The database contains 36 tables in total, including SQLite internal tables.</text>
+    <text x="100" y="1125" class="entity-attribute">* FTS tables include triggers to maintain synchronization with content tables.</text>
+    <text x="100" y="1145" class="entity-attribute">* Tables are grouped logically to better visualize relationships between related entities.</text>
+    
+    <!-- Footer -->
+    <text x="600" y="1180" text-anchor="middle" class="entity-attribute">JMDict and Kanjidic2 SQLite Converter - Database Schema</text>
+</svg> 
