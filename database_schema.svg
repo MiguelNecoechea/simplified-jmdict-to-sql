@@ -389,7 +389,6 @@
     <text x="160" y="1400" class="entity-attribute">Full-Text Search Relationship</text>
     
     <text x="100" y="1425" class="entity-attribute">* The diagram shows the main tables and relationships. Some auxiliary tables are grouped for clarity.</text>
-    <text x="100" y="1445" class="entity-attribute">* Row counts are based on a full dictionary import (JMdict: 22,571 entries, Kanjidic2: 10,383 characters).</text>
     <text x="100" y="1465" class="entity-attribute">* The database contains 36 tables in total, including SQLite internal tables.</text>
     <text x="100" y="1485" class="entity-attribute">* FTS tables include triggers to maintain synchronization with content tables.</text>
     
