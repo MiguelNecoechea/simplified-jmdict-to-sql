@@ -120,68 +120,6 @@ Adjust memory usage (for systems with limited RAM):
 python src/main.py --memory-limit 10000  # Use ~10MB of RAM for cache
 ```
 
-## Database Schema
-
-The database is organized into multiple tables that store different aspects of the JMdict and Kanjidic2 dictionaries. Below is a comprehensive description of all tables in the database.
-
-### JMdict Tables
-
-#### Core Tables
-- `jmdict_entries` (22,571 rows): Main entries table containing unique dictionary entries with their IDs and sequence numbers
-- `jmdict_kanji` (26,128 rows): Kanji writings for entries, with references to their parent entries
-- `jmdict_kana` (27,342 rows): Kana (pronunciation) readings for entries, with references to their parent entries
-- `jmdict_sense` (36,427 rows): Sense/meaning groups for entries, organizing different meanings of the same word
-- `jmdict_gloss` (85,001 rows): Translations/definitions for each sense, in different languages
-
-#### Full-Text Search Tables
-- `jmdict_gloss_fts` (85,001 rows): Virtual FTS5 table for full-text search on glosses
-- `jmdict_gloss_fts_config` (1 row): Configuration for the FTS5 virtual table
-- `jmdict_gloss_fts_data` (239 rows): Data storage for the FTS5 index
-- `jmdict_gloss_fts_idx` (224 rows): Index for the FTS5 virtual table
-- `jmdict_gloss_fts_docsize` (85,001 rows): Document size information for FTS5 ranking algorithms
-
-#### Relationship Tables
-- `jmdict_kana_to_kanji` (29,082 rows): Maps kana readings to their corresponding kanji writings
-- `jmdict_sense_applies_to_kana` (496 rows): Specifies which senses apply to which kana readings
-- `jmdict_sense_applies_to_kanji` (380 rows): Specifies which senses apply to which kanji writings
-
-#### Tag and Classification Tables
-- `jmdict_kanji_tags` (4,791 rows): Tags for kanji writings (e.g., ateji, irregular kanji usage)
-- `jmdict_kana_tags` (1,412 rows): Tags for kana readings (e.g., gikun, irregular readings)
-- `jmdict_sense_pos` (56,791 rows): Part-of-speech information for senses (e.g., noun, verb, adjective)
-- `jmdict_sense_field` (2,159 rows): Field of application for senses (e.g., computing, sports, medicine)
-- `jmdict_sense_misc` (5,325 rows): Miscellaneous information about senses (e.g., colloquial, honorific)
-- `jmdict_sense_dialect` (42 rows): Dialect information for senses (e.g., Kansai, Kyoto)
-- `jmdict_sense_info` (1,915 rows): Additional information about senses
-- `jmdict_language_source` (633 rows): Source language information for loanwords
-- `jmdict_xrefs` (4,565 rows): Cross-references to related entries and antonyms
-
-### Kanjidic2 Tables
-
-#### Core Tables
-- `kanjidic_characters` (10,383 rows): Main kanji table with basic information about each character
-- `kanjidic_readings` (74,850 rows): Various readings for kanji (on, kun, nanori, etc.)
-- `kanjidic_meanings` (24,823 rows): Meanings of kanji in different languages
-
-#### Full-Text Search Tables
-- `kanjidic_meanings_fts`: Virtual FTS5 table for full-text search on kanji meanings
-- `kanjidic_meanings_fts_config`: Configuration for the Kanjidic FTS5 virtual table
-- `kanjidic_meanings_fts_data`: Data storage for the Kanjidic FTS5 index
-- `kanjidic_meanings_fts_idx`: Index for the Kanjidic FTS5 virtual table
-- `kanjidic_meanings_fts_docsize`: Document size information for Kanjidic FTS5 ranking algorithms
-
-#### Reference and Classification Tables
-- `kanjidic_codepoints` (22,804 rows): Unicode and other encoding information for kanji
-- `kanjidic_radicals` (11,104 rows): Radical information for kanji
-- `kanjidic_variants` (4,122 rows): Variant forms of kanji
-- `kanjidic_dict_references` (65,363 rows): References to kanji in various dictionaries
-- `kanjidic_query_codes` (26,588 rows): Codes for looking up kanji in various systems
-- `kanjidic_radical_names` (146 rows): Names of radicals
-- `kanjidic_nanori` (3,444 rows): Name readings for kanji
-
-### Other Tables
-- `tags` (390 rows): Central repository of all tags used across the database
-- `sqlite_stat1` (36 rows): SQLite internal table for query optimization statistics
 
 ### Entity Relationship Diagram
 
