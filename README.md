@@ -32,101 +32,6 @@ A tool to convert JMdict and Kanjidic2 JSON files from [jmdict-simplified](https
 
 3. Download the JSON files from [jmdict-simplified](https://scriptin.github.io/jmdict-simplified/) and place them in the project directory.
 
-## Usage
-
-### Basic Usage
-
-To build the database with default settings:
-
-```bash
-python src/main.py
-```
-
-This will:
-- Auto-detect JSON files in the current directory
-- Create a SQLite database at `./output/jmdict_kanjidic.db`
-- Load both JMdict and Kanjidic2 data
-
-### Command-line Options
-
-```
-usage: main.py [-h] [--output OUTPUT] [--input-dir INPUT_DIR] [--jmdict JMDICT]
-               [--jmdict-common JMDICT_COMMON] [--kanjidic KANJIDIC] [--common-only]
-               [--skip-jmdict] [--skip-kanjidic] [--rebuild-fts] [--rebuild-kanjidic-fts]
-               [--memory-limit MEMORY_LIMIT]
-
-Build SQLite database from JMdict and Kanjidic2 JSON files
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --output OUTPUT, -o OUTPUT
-                        Output SQLite database file path
-  --input-dir INPUT_DIR, -i INPUT_DIR
-                        Directory containing the JSON dictionary files
-  --jmdict JMDICT       Path to JMdict JSON file (overrides auto-detection)
-  --jmdict-common JMDICT_COMMON
-                        Path to JMdict common words JSON file (overrides auto-detection)
-  --kanjidic KANJIDIC   Path to Kanjidic2 JSON file (overrides auto-detection)
-  --common-only         Only load common words from JMdict
-  --skip-jmdict         Skip loading JMdict data
-  --skip-kanjidic       Skip loading Kanjidic2 data
-  --rebuild-fts         Rebuild the full-text search index (useful for fixing corrupted indexes)
-  --rebuild-kanjidic-fts Rebuild only the Kanjidic full-text search index
-  --memory-limit MEMORY_LIMIT
-                        Memory limit for SQLite cache in KB (default: 20000 = ~20MB)
-```
-
-### Examples
-
-Load only common words:
-
-```bash
-python src/main.py --common-only
-```
-
-Specify custom file paths:
-
-```bash
-python src/main.py --jmdict path/to/jmdict-eng-3.6.1.json --kanjidic path/to/kanjidic2-en-3.6.1.json
-```
-
-Skip loading Kanjidic2 data:
-
-```bash
-python src/main.py --skip-kanjidic
-```
-
-Specify a custom output path:
-
-```bash
-python src/main.py --output /path/to/my_dictionary.db
-```
-
-Rebuild all full-text search indexes (fixes null blob issues):
-
-```bash
-python src/main.py --rebuild-fts
-```
-
-Rebuild only the Kanjidic full-text search index:
-
-```bash
-python src/main.py --rebuild-kanjidic-fts
-```
-
-Adjust memory usage (for systems with limited RAM):
-
-```bash
-python src/main.py --memory-limit 10000  # Use ~10MB of RAM for cache
-```
-
-
-### Entity Relationship Diagram
-
-The following diagram illustrates the main tables and relationships between them:
-
-![Database Schema](./database_schema.svg)
-
 ## Table Relationships
 
 ### JMdict Relationships
@@ -143,6 +48,101 @@ The following diagram illustrates the main tables and relationships between them
 - Each character in `kanjidic_characters` can have multiple radical associations in `kanjidic_radicals`
 - Each character in `kanjidic_characters` can have multiple dictionary references in `kanjidic_dict_references`
 
+## Database Schema
+
+The SQLite database is structured with optimized tables for both JMdict and Kanjidic2 data.
+
+### Common Tables
+
+#### Tags
+Stores all types of tags used throughout the database with their descriptions and categories.
+
+### JMdict Tables
+
+#### Entries
+The main dictionary entries table that serves as the parent for all related data.
+
+#### Kanji Writings
+Stores kanji writings for entries with a flag indicating if they are common.
+
+#### Kana Readings
+Stores kana (pronunciation) readings for entries with a flag indicating if they are common.
+
+#### Sense
+Represents different meanings or senses of an entry.
+
+#### Gloss
+Stores translations (glosses) for each sense, with language and other attributes.
+
+#### Full-Text Search
+Enables efficient full-text search on glosses using SQLite's FTS5 extension.
+
+#### Junction Tables
+- `jmdict_kanji_tags`: Links kanji writings to their tags
+- `jmdict_kana_tags`: Links kana readings to their tags
+- `jmdict_kana_to_kanji`: Maps which kana readings apply to which kanji writings
+- `jmdict_sense_pos`: Links senses to part-of-speech tags
+- `jmdict_sense_applies_to_kanji`: Specifies which senses apply to which kanji writings
+- `jmdict_sense_applies_to_kana`: Specifies which senses apply to which kana readings
+- `jmdict_sense_field`: Links senses to field tags (domains)
+- `jmdict_sense_misc`: Links senses to miscellaneous tags
+- `jmdict_sense_dialect`: Links senses to dialect tags
+- `jmdict_sense_info`: Stores additional information for senses
+- `jmdict_language_source`: Stores etymology information
+- `jmdict_xrefs`: Stores cross-references and antonyms
+
+### Kanjidic2 Tables
+
+#### Characters
+The main kanji table with basic information about each character including grade, stroke count, frequency, and JLPT level.
+
+#### Readings
+Stores different readings (on, kun, etc.) for each kanji character.
+
+#### Meanings
+Stores meanings of kanji characters in different languages.
+
+#### Full-Text Search
+Enables efficient full-text search on kanji meanings.
+
+#### Additional Kanji Information
+- `kanjidic_codepoints`: Unicode and other encoding values
+- `kanjidic_radicals`: Radical classifications
+- `kanjidic_variants`: Variant forms of characters
+- `kanjidic_radical_names`: Names of radicals
+- `kanjidic_dict_references`: References to external dictionaries
+- `kanjidic_query_codes`: Codes for looking up characters in various systems
+- `kanjidic_nanori`: Name readings for kanji
+
+### Indexes
+
+The database includes optimized indexes for frequently queried fields:
+
+#### JMdict Indexes
+- `idx_jmdict_kanji_text`: For searching by kanji text
+- `idx_jmdict_kanji_common`: For filtering common kanji
+- `idx_jmdict_kana_text`: For searching by kana text
+- `idx_jmdict_kana_common`: For filtering common readings
+- `idx_jmdict_gloss_text`: For searching translations
+- `idx_jmdict_gloss_lang`: For filtering by language
+
+#### Kanjidic Indexes
+- `idx_kanjidic_grade`: For filtering by school grade
+- `idx_kanjidic_stroke_count`: For filtering by stroke count
+- `idx_kanjidic_frequency`: For sorting by frequency
+- `idx_kanjidic_jlpt_level`: For filtering by JLPT level
+- `idx_kanjidic_readings_value`: For searching readings
+- `idx_kanjidic_readings_type`: For filtering reading types
+- `idx_kanjidic_meanings_value`: For searching meanings
+
+### Performance Features
+
+- WAL journal mode for better concurrency
+- Optimized cache settings
+- Foreign key constraints for data integrity
+- Triggers to maintain FTS indexes
+- Unicode-aware tokenization for multilingual search
+
 ## Performance Considerations
 
 - The database uses SQLite's WAL mode for better concurrency
@@ -156,23 +156,11 @@ The following diagram illustrates the main tables and relationships between them
 
 ### FTS Index Issues
 
-If you encounter issues with the full-text search (like null blobs in the FTS tables), you can rebuild the FTS indexes:
-
-```bash
-# Rebuild all FTS indexes
-python src/main.py --rebuild-fts
-
-# Rebuild only the Kanjidic FTS index
-python src/main.py --rebuild-kanjidic-fts
-```
+If you encounter issues with the full-text search (like null blobs in the FTS tables), you can rebuild the FTS indexes using the appropriate command-line options.
 
 ### Memory Usage
 
-If you're running on a system with limited memory, you can reduce the memory usage:
-
-```bash
-python src/main.py --memory-limit 5000  # Use ~5MB of RAM for cache
-```
+If you're running on a system with limited memory, you can reduce the memory usage using the memory limit option.
 
 ## License
 
