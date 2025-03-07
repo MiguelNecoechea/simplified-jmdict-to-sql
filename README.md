@@ -174,36 +174,6 @@ If you're running on a system with limited memory, you can reduce the memory usa
 python src/main.py --memory-limit 5000  # Use ~5MB of RAM for cache
 ```
 
-## Testing
-
-The project includes a test script to verify the database output and ensure all components are working correctly.
-
-### Running Tests
-
-To run the tests on the generated database:
-
-```bash
-python src/test_database.py
-```
-
-By default, the script will test the database at `./output/jmdict_kanjidic.db`. To specify a different database file:
-
-```bash
-python src/test_database.py --database /path/to/custom/database.db
-```
-
-### What Gets Tested
-
-The test script performs the following checks:
-
-1. **Database Structure**: Verifies that all expected tables exist in the database.
-2. **Record Counts**: Reports the number of records in each table.
-3. **JMdict Queries**: Tests basic JMdict lookup and full-text search functionality.
-4. **Kanjidic Queries**: Tests kanji lookups, readings, and Kanjidic FTS functionality.
-5. **Database Integrity**: Runs SQLite integrity checks and foreign key validation.
-
-The script provides detailed output about each test and summarizes the results at the end, making it easy to identify and fix any issues.
-
 ## License
 
 This project is licensed under the GNU License - see the LICENSE file for details.
