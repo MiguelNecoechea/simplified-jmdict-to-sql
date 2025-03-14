@@ -8,9 +8,9 @@ Later on these object will be used to create an SQL database of words and charac
 import os
 import sys
 import argparse
-from JMDictParsing.JMDictParser import JMDictParser
-from KanjidicParsing.Kanjidic2Parsing import Kanjidic2Parser
-from JMneDictParsing.JMneDictParsing import JMneDictParser
+from Parsing.JMDictParsing.JMDictParser import JMDictParser
+from Parsing.KanjidicParsing.Kanjidic2Parsing import Kanjidic2Parser
+from Parsing.JMneDictParsing.JMneDictParsing import JMneDictParser
 from dataDownloader.dictsDownloader import DictionaryDownloader
 
 def parse_jmdict(file_path, show_progress=True, verbose=True):
