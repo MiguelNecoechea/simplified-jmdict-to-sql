@@ -24,15 +24,16 @@ class DictionaryDownloader:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.latest_version = None
         self.base_url = None
+        self.file_type_names = {}
         self.available_assets = {}
         
         # Dictionary of files to download: key is the file name, value is the file pattern to look for
         self.files_to_download = {
             "JMdict": "jmdict-eng-",
             "JMnedict": "jmnedict-all-",
-            "Kanjidic": "kanjidic2-all-",
-            "Kradfile": "kradfile-",
-            "Radkfile": "radkfile-"
+            "Kanjidic": "kanjidic2-all-"
+            # "Kradfile": "kradfile-",
+            # "Radkfile": "radkfile-"
         }
     
     def get_latest_release_info(self):
@@ -62,6 +63,12 @@ class DictionaryDownloader:
         except Exception as e:
             print(f"Error fetching latest release info: {e}")
             return False
+    
+    def get_files_names(self):
+        """
+        Get the file name of each type of file.
+        """
+        return self.file_type_names
     
     def find_matching_asset(self, file_pattern):
         """
@@ -112,7 +119,7 @@ class DictionaryDownloader:
             print(f"Error downloading {url}: {e}")
             return False
     
-    def extract_zip(self, zip_path, extract_dir):
+    def extract_zip(self, zip_path, extract_dir, file_name):
         """
         Extract a zip file to a directory.
         
@@ -124,7 +131,8 @@ class DictionaryDownloader:
             bool: True if extraction was successful, False otherwise
         """
         try:
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:     
+                self.file_type_names[file_name] = zip_ref.namelist()[0]
                 zip_ref.extractall(extract_dir)
             return True
         except Exception as e:
@@ -153,7 +161,7 @@ class DictionaryDownloader:
                 print(f"Downloading {name}...")
                 if self.download_file(download_url, zip_path):
                     print(f"Extracting {name}...")
-                    if self.extract_zip(zip_path, self.output_dir):
+                    if self.extract_zip(zip_path, self.output_dir, name):
                         print(f"Deleting zip file {zip_path}...")
                         zip_path.unlink()
                     else:
