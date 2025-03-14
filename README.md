@@ -9,13 +9,6 @@ A Python tool for parsing and working with Japanese dictionary files in JSON for
   - JMnedict (Japanese Names Dictionary)
   - Kanjidic2 (Kanji Dictionary)
 - Download dictionary files automatically
-- Search for entries by various criteria:
-  - JMDict: kanji, kana, gloss text, part of speech, field, dialect, or miscellaneous tags
-  - JMnedict: name, reading, or translation
-  - Kanjidic2: kanji, reading, meaning, or various kanji attributes
-- Filter entries by common usage
-- Display formatted dictionary entries with different levels of detail
-- Export parsed data or search results to JSON
 - Command-line interface for easy usage
 
 ## Installation
@@ -33,7 +26,8 @@ A Python tool for parsing and working with Japanese dictionary files in JSON for
 
 ## Usage
 
-### Command-line Interface
+### Basic Usage
+#### Command-line Interface
 
 The main script provides a command-line interface for parsing dictionary files:
 
@@ -46,8 +40,6 @@ python src/main.py [options]
 #### General Options
 
 - `--verbose`: Display verbose output.
-- `--download`: Download dictionary files before parsing.
-- `--output-dir`: Specify the output directory for downloaded files.
 
 ## Using the Parsers in Your Code
 
