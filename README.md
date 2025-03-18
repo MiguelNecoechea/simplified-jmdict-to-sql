@@ -1,21 +1,15 @@
-# JMDict and Kanjidic2 SQLite Converter
+# JMDict Converter
 
-A tool to convert JMdict and Kanjidic2 JSON files from [jmdict-simplified](https://scriptin.github.io/jmdict-simplified/) into a SQLite database for efficient searching and retrieval.
+A Python tool for parsing and working with Japanese dictionary files in JSON format from the [jmdict-simplified](https://github.com/scriptin/jmdict-simplified) project.
 
 ## Features
 
-- Converts JMdict and Kanjidic2 JSON files to a SQLite database
-- Optimized database schema for fast searching
-- Full-text search support for dictionary entries
-- Support for both full dictionary and common words only
-- Comprehensive command-line interface
-- High-performance batch processing
-- Memory usage control
-
-## Requirements
-
-- Python 3.6+
-- Dependencies listed in `requirements.txt`
+- Parse multiple Japanese dictionary formats:
+  - JMDict (Japanese-Multilingual Dictionary)
+  - JMnedict (Japanese Names Dictionary)
+  - Kanjidic2 (Kanji Dictionary)
+- Download dictionary files automatically
+- Command-line interface for easy usage
 
 ## Installation
 
@@ -25,142 +19,142 @@ A tool to convert JMdict and Kanjidic2 JSON files from [jmdict-simplified](https
    cd JMDictConverter
    ```
 
-2. Install dependencies:
+2. Install the required dependencies:
    ```
    pip install -r requirements.txt
    ```
 
-3. Download the JSON files from [jmdict-simplified](https://scriptin.github.io/jmdict-simplified/) and place them in the project directory.
+## Usage
 
-## Table Relationships
+### Basic Usage
+#### Command-line Interface
 
-### JMdict Relationships
-- Each entry in `jmdict_entries` can have multiple kanji writings in `jmdict_kanji`
-- Each entry in `jmdict_entries` can have multiple kana readings in `jmdict_kana`
-- Each entry in `jmdict_entries` can have multiple senses in `jmdict_sense`
-- Each sense in `jmdict_sense` can have multiple glosses in `jmdict_gloss`
-- Each kanji and kana can have multiple tags in `jmdict_kanji_tags` and `jmdict_kana_tags`
-- Each sense can have multiple part-of-speech tags, field tags, etc. in the respective junction tables
+The main script provides a command-line interface for parsing dictionary files:
 
-### Kanjidic2 Relationships
-- Each character in `kanjidic_characters` can have multiple readings in `kanjidic_readings`
-- Each character in `kanjidic_characters` can have multiple meanings in `kanjidic_meanings`
-- Each character in `kanjidic_characters` can have multiple radical associations in `kanjidic_radicals`
-- Each character in `kanjidic_characters` can have multiple dictionary references in `kanjidic_dict_references`
+```bash
+python src/main.py [options]
+```
 
-## Database Schema
+### Command-line Options
 
-The SQLite database is structured with optimized tables for both JMdict and Kanjidic2 data.
+#### General Options
 
-### Common Tables
+- `--verbose`: Display verbose output.
 
-#### Tags
-Stores all types of tags used throughout the database with their descriptions and categories.
+## Using the Parsers in Your Code
 
-### JMdict Tables
+### JMDict Parser
 
-#### Entries
-The main dictionary entries table that serves as the parent for all related data.
+```python
+from src.JMDictParsing import JMDictParser, JMDictWord, JMDictKanji, JMDictKana, JMDictSense, JMDictGloss
 
-#### Kanji Writings
-Stores kanji writings for entries with a flag indicating if they are common.
+# Initialize the parser with the path to the JMDict JSON file
+parser = JMDictParser('path/to/jmdict.json')
 
-#### Kana Readings
-Stores kana (pronunciation) readings for entries with a flag indicating if they are common.
+# Parse the file (with progress bar)
+entries = parser.parse()  # Returns a list of JMDictWord objects
 
-#### Sense
-Represents different meanings or senses of an entry.
+# Parse the file (without progress bar)
+entries = parser.parse(show_progress=False)
 
-#### Gloss
-Stores translations (glosses) for each sense, with language and other attributes.
+# Get metadata
+metadata = parser.get_metadata()
 
-#### Full-Text Search
-Enables efficient full-text search on glosses using SQLite's FTS5 extension.
+# Get a specific entry by ID
+entry = parser.get_entry_by_id('1000050')  # Returns a JMDictWord object
 
-#### Junction Tables
-- `jmdict_kanji_tags`: Links kanji writings to their tags
-- `jmdict_kana_tags`: Links kana readings to their tags
-- `jmdict_kana_to_kanji`: Maps which kana readings apply to which kanji writings
-- `jmdict_sense_pos`: Links senses to part-of-speech tags
-- `jmdict_sense_applies_to_kanji`: Specifies which senses apply to which kanji writings
-- `jmdict_sense_applies_to_kana`: Specifies which senses apply to which kana readings
-- `jmdict_sense_field`: Links senses to field tags (domains)
-- `jmdict_sense_misc`: Links senses to miscellaneous tags
-- `jmdict_sense_dialect`: Links senses to dialect tags
-- `jmdict_sense_info`: Stores additional information for senses
-- `jmdict_language_source`: Stores etymology information
-- `jmdict_xrefs`: Stores cross-references and antonyms
+# Print entries with different levels of detail
+parser.print_entry(entries[0])  # Basic information
+parser.print_detailed_entry(entries[0])  # Detailed information
+parser.print_all_fields(entries[0])  # All fields in JSON format
+```
 
-### Kanjidic2 Tables
+### JMnedict Parser
 
-#### Characters
-The main kanji table with basic information about each character including grade, stroke count, frequency, and JLPT level.
+```python
+from src.JMneDictParsing import JMneDictParser, JMneDictEntry
 
-#### Readings
-Stores different readings (on, kun, etc.) for each kanji character.
+# Initialize the parser with the path to the JMnedict JSON file
+parser = JMneDictParser('path/to/jmnedict.json')
 
-#### Meanings
-Stores meanings of kanji characters in different languages.
+# Parse the file
+entries = parser.parse()  # Returns a list of JMneDictEntry objects
 
-#### Full-Text Search
-Enables efficient full-text search on kanji meanings.
+# Get metadata
+metadata = parser.get_metadata()
 
-#### Additional Kanji Information
-- `kanjidic_codepoints`: Unicode and other encoding values
-- `kanjidic_radicals`: Radical classifications
-- `kanjidic_variants`: Variant forms of characters
-- `kanjidic_radical_names`: Names of radicals
-- `kanjidic_dict_references`: References to external dictionaries
-- `kanjidic_query_codes`: Codes for looking up characters in various systems
-- `kanjidic_nanori`: Name readings for kanji
+# Print entries
+parser.print_entry(entries[0])
+```
 
-### Indexes
+### Kanjidic2 Parser
 
-The database includes optimized indexes for frequently queried fields:
+```python
+from src.KanjidicParsing import Kanjidic2Parser, Kanjidic2Character
 
-#### JMdict Indexes
-- `idx_jmdict_kanji_text`: For searching by kanji text
-- `idx_jmdict_kanji_common`: For filtering common kanji
-- `idx_jmdict_kana_text`: For searching by kana text
-- `idx_jmdict_kana_common`: For filtering common readings
-- `idx_jmdict_gloss_text`: For searching translations
-- `idx_jmdict_gloss_lang`: For filtering by language
+# Initialize the parser with the path to the Kanjidic2 JSON file
+parser = Kanjidic2Parser('path/to/kanjidic2.json')
 
-#### Kanjidic Indexes
-- `idx_kanjidic_grade`: For filtering by school grade
-- `idx_kanjidic_stroke_count`: For filtering by stroke count
-- `idx_kanjidic_frequency`: For sorting by frequency
-- `idx_kanjidic_jlpt_level`: For filtering by JLPT level
-- `idx_kanjidic_readings_value`: For searching readings
-- `idx_kanjidic_readings_type`: For filtering reading types
-- `idx_kanjidic_meanings_value`: For searching meanings
+# Parse the file
+characters = parser.parse()  # Returns a list of Kanjidic2Character objects
 
-### Performance Features
+# Get metadata
+metadata = parser.get_metadata()
 
-- WAL journal mode for better concurrency
-- Optimized cache settings
-- Foreign key constraints for data integrity
-- Triggers to maintain FTS indexes
-- Unicode-aware tokenization for multilingual search
+# Print character information
+parser.print_character(characters[0])
+```
 
-## Performance Considerations
+### Dictionary Downloader
 
-- The database uses SQLite's WAL mode for better concurrency
-- Indexes are created on commonly searched fields
-- Full-text search is enabled for glosses using the FTS5 extension
-- Batch processing is used for faster imports
-- Triggers are temporarily disabled during bulk loading
-- Memory usage can be controlled via command-line options
+```python
+from src.dataDownloader import DictionaryDownloader
 
-## Troubleshooting
+# Initialize the downloader
+downloader = DictionaryDownloader(output_dir='path/to/output')
 
-### FTS Index Issues
+# Download all dictionaries
+downloader.download_all()
 
-If you encounter issues with the full-text search (like null blobs in the FTS tables), you can rebuild the FTS indexes using the appropriate command-line options.
+# Or download specific dictionaries
+downloader.download_jmdict()
+downloader.download_jmnedict()
+downloader.download_kanjidic2()
+```
 
-### Memory Usage
+## Dictionary Entity Classes
 
-If you're running on a system with limited memory, you can reduce the memory usage using the memory limit option.
+The JMDictConverter provides entity classes to represent the structure of each dictionary:
+
+### JMDict Entities
+
+- `JMDict`: Root object of the JMDict JSON file
+- `JMDictWord`: Dictionary entry/word
+- `JMDictKanji`: Kanji (and other non-kana) writing of a word
+- `JMDictKana`: Kana-only writing of a word
+- `JMDictSense`: Sense (translation and related information) of a word
+- `JMDictGloss`: Translation of a word in a specific language
+- `JMDictLanguageSource`: Source language information for borrowed words
+
+### JMnedict Entities
+
+- `JMneDictEntry`: Dictionary entry for a name
+- `JMneDictKanji`: Kanji writing of a name
+- `JMneDictReading`: Reading (pronunciation) of a name
+- `JMneDictTranslation`: Translation of a name
+
+### Kanjidic2 Entities
+
+- `Kanjidic2Character`: Kanji character with all its properties
+- `Kanjidic2Reading`: Reading (pronunciation) of a kanji
+- `Kanjidic2Meaning`: Meaning of a kanji in a specific language
+- `Kanjidic2CodePoint`: Unicode and other encoding information
+- `Kanjidic2Radical`: Radical information
+- `Kanjidic2Variant`: Variant forms of the kanji
+- `Kanjidic2DictionaryReference`: References to external dictionaries
+- `Kanjidic2QueryCode`: Query codes for looking up the kanji
+- `Kanjidic2StrokeCount`: Stroke count information
+- `Kanjidic2Miscellaneous`: Miscellaneous information
 
 ## License
 
@@ -187,7 +181,7 @@ The JSON format dictionary files used by this converter are from the [jmdict-sim
 ## Acknowledgments
 
 - [jmdict-simplified](https://github.com/scriptin/jmdict-simplified) for providing the JSON files and the conversion from the original XML format
-- The [Electronic Dictionary Research and Development Group (EDRDG)](https://www.edrdg.org/) for the original JMdict and Kanjidic2 projects
+- The [Electronic Dictionary Research and Development Group (EDRDG)](https://www.edrdg.org/) for the original JMdict, JMnedict, and Kanjidic2 projects
 - Jim Breen for starting the JMdict project in 1991
 - Jim Rose for the RADKFILE2 and KRADFILE2 files
 - All contributors to these dictionary projects
