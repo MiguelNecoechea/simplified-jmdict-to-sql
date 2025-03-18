@@ -12,6 +12,7 @@ from Parsing.JMDictParsing.JMDictParser import JMDictParser
 from Parsing.KanjidicParsing.Kanjidic2Parsing import Kanjidic2Parser
 from Parsing.JMneDictParsing.JMneDictParsing import JMneDictParser
 from dataDownloader.dictsDownloader import DictionaryDownloader
+from DatabaseGeneration.database_manager import DatabaseManager
 
 def parse_jmdict(file_path, show_progress=True, verbose=True):
     """
@@ -23,14 +24,14 @@ def parse_jmdict(file_path, show_progress=True, verbose=True):
         verbose: Whether to display verbose output.
     Returns:
         int: Exit code.
-        list[JMDictWord]: List of entries.
+        JMDict: The complete JMDict object with metadata and entries.
     """
     jmdict_parser = JMDictParser(file_path)
-    entries = jmdict_parser.parse(show_progress=show_progress)
+    jmdict = jmdict_parser.parse(show_progress=show_progress)
     
-    if not entries:
+    if not jmdict or not jmdict.words:
         print("No entries were parsed on the JMDict file")
-        return 1
+        return 1, None
     
     metadata = jmdict_parser.get_metadata()
     if verbose:
@@ -41,9 +42,9 @@ def parse_jmdict(file_path, show_progress=True, verbose=True):
         print(f"  Dictionary Revisions: {', '.join(metadata.get('dictRevisions', []))}")
         print(f"  Common Only: {metadata.get('commonOnly', False)}")
         print(f"  Number of Tags: {len(metadata.get('tags', {}))}")
-        print(f"Successfully parsed {len(entries)} entries.")
+        print(f"Successfully parsed {len(jmdict.words)} entries.")
     
-    return 0, entries
+    return 0, jmdict
 
 
 def parse_jmnedict(file_path, show_progress=True, verbose=True):
@@ -56,14 +57,14 @@ def parse_jmnedict(file_path, show_progress=True, verbose=True):
         verbose: Whether to display verbose output.
     Returns:
         int: Exit code.
-        list[JMneDictWord]: List of word entries.
+        JMneDict: The complete JMneDict object with metadata and entries.
     """
     jmnedict_parser = JMneDictParser(file_path)
-    entries = jmnedict_parser.parse(show_progress=show_progress)
+    jmnedict = jmnedict_parser.parse(show_progress=show_progress)
     
-    if not entries:
+    if not jmnedict or not jmnedict.words:
         print("No entries were parsed. on the JMnedict file")
-        return 1
+        return 1, None
     
     metadata = jmnedict_parser.get_metadata()
     if verbose:
@@ -73,9 +74,9 @@ def parse_jmnedict(file_path, show_progress=True, verbose=True):
         print(f"  Dictionary Date: {metadata.get('dictDate', 'N/A')}")
         print(f"  Dictionary Revisions: {', '.join(metadata.get('dictRevisions', []))}")
         print(f"  Number of Tags: {len(metadata.get('tags', {}))}")    
-        print(f"Successfully parsed {len(entries)} entries.")
+        print(f"Successfully parsed {len(jmnedict.words)} entries.")
 
-    return 0, entries
+    return 0, jmnedict
 
 
 def parse_kanjidic2(file_path, show_progress=True, verbose=True):
@@ -88,14 +89,14 @@ def parse_kanjidic2(file_path, show_progress=True, verbose=True):
         verbose: Whether to display verbose output.
     Returns:
         int: Exit code.
-        list[Kanjidic2Character]: List of characters.
+        Kanjidic2: The complete Kanjidic2 object with metadata and characters.
     """
     kanjidic2_parser = Kanjidic2Parser(file_path)
-    characters = kanjidic2_parser.parse(show_progress=show_progress)
+    kanjidic2 = kanjidic2_parser.parse(show_progress=show_progress)
     
-    if not characters:
+    if not kanjidic2 or not kanjidic2.characters:
         print("No characters were parsed on the Kanjidic2 file")
-        return 1
+        return 1, None
     
     
     metadata = kanjidic2_parser.get_metadata()
@@ -107,9 +108,9 @@ def parse_kanjidic2(file_path, show_progress=True, verbose=True):
         print(f"  File Version: {metadata.get('fileVersion', 'N/A')}")
         print(f"  Database Version: {metadata.get('databaseVersion', 'N/A')}")
         print(f"  Character Count: {metadata.get('characterCount', 0)}")
-        print(f"Successfully parsed {len(characters)} characters.")    
+        print(f"Successfully parsed {len(kanjidic2.characters)} characters.")    
 
-    return 0, characters
+    return 0, kanjidic2
 
 def parse_arguments():
     """
@@ -117,6 +118,9 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(description="Parse JMDict, JMnedict, and Kanjidic2 JSON files.")
     parser.add_argument("--verbose", action="store_true", help="Display verbose output.")
+    parser.add_argument("--no-database", action="store_true", help="Skip database generation.")
+    parser.add_argument("--db-path", type=str, default=os.path.join(os.path.dirname(__file__), "..", "output", "database", "japanese_dictionary.db"),
+                        help="Path to the output SQLite database file.")
     return parser.parse_args()
 
 
@@ -134,15 +138,33 @@ def main():
     json_files_path = os.path.join(os.path.dirname(__file__), "..", "output", "dictionaries")
 
     # Parse the Kanjidic2 file
-    _, kanjidic2_entries = parse_kanjidic2(os.path.join(json_files_path, file_type_names["Kanjidic"]), show_progress=args.verbose, verbose=args.verbose)
+    _, kanjidic2_data = parse_kanjidic2(os.path.join(json_files_path, file_type_names["Kanjidic"]), show_progress=args.verbose, verbose=args.verbose)
     
-
     # Parse the JMnedict file
-    _, jmnedict_entries = parse_jmnedict(os.path.join(json_files_path, file_type_names["JMnedict"]), show_progress=args.verbose, verbose=args.verbose)
+    _, jmnedict_data = parse_jmnedict(os.path.join(json_files_path, file_type_names["JMnedict"]), show_progress=args.verbose, verbose=args.verbose)
 
     # Parse the JMDict file
-    _, jmdict_entries = parse_jmdict(os.path.join(json_files_path, file_type_names["JMdict"]), show_progress=args.verbose, verbose=args.verbose)
+    _, jmdict_data = parse_jmdict(os.path.join(json_files_path, file_type_names["JMdict"]), show_progress=args.verbose, verbose=args.verbose)
 
+    # Generate the SQLite database
+    if not args.no_database:
+        print("\nGenerating SQLite database...")
+        db_manager = DatabaseManager(args.db_path)
+        
+        try:
+            db_manager.initialize_database(
+                jmdict=jmdict_data,
+                jmnedict=jmnedict_data,
+                kanjidic2=kanjidic2_data,
+                show_progress=args.verbose
+            )
+            print(f"Database successfully created at: {args.db_path}")
+        except Exception as e:
+            print(f"Error creating database: {e}")
+            return 1
+        finally:
+            db_manager.close()
+    
     return 0
 
 
