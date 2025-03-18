@@ -36,7 +36,7 @@ class JMneDictParser:
         self.file_path = file_path
         self.jmnedict = None
     
-    def parse(self, show_progress: bool = True) -> List[JMneDictWord]:
+    def parse(self, show_progress: bool = True) -> JMneDict:
         """
         Parse the JMnedict JSON file into a JMneDict object.
         
@@ -45,7 +45,7 @@ class JMneDictParser:
                 Defaults to True.
         
         Returns:
-            List[JMneDictWord]: List of parsed name entries.
+            JMneDict: The parsed JMneDict object containing metadata and words.
         """
         try:
             with open(self.file_path, 'r', encoding='utf-8') as file:
@@ -55,16 +55,16 @@ class JMneDictParser:
                 print("Creating JMneDict object...")
                 self.jmnedict = JMneDict(jmnedict_data, show_progress=show_progress)
                 
-                return self.jmnedict.words
+                return self.jmnedict
         except FileNotFoundError:
             print(f"Error: File not found at {self.file_path}")
-            return []
+            return None
         except json.JSONDecodeError:
             print(f"Error: Invalid JSON format in file {self.file_path}")
-            return []
+            return None
         except Exception as e:
             print(f"Error parsing JMnedict file: {str(e)}")
-            return []
+            return None
     
     def get_metadata(self) -> Dict:
         """

@@ -36,7 +36,7 @@ class JMDictParser:
         self.file_path = file_path
         self.jmdict = None
     
-    def parse(self, show_progress: bool = True) -> List[JMDictWord]:
+    def parse(self, show_progress: bool = True) -> JMDict:
         """
         Parse the JMDict JSON file into a JMDict object.
         
@@ -45,7 +45,7 @@ class JMDictParser:
                 Defaults to True.
         
         Returns:
-            List[JMDictWord]: List of parsed dictionary entries.
+            JMDict: The parsed JMDict object containing metadata and words.
         """
         try:
             with open(self.file_path, 'r', encoding='utf-8') as file:
@@ -55,16 +55,16 @@ class JMDictParser:
                 print("Creating JMDict object...")
                 self.jmdict = JMDict(jmdict_data, show_progress=show_progress)
                 
-                return self.jmdict.words
+                return self.jmdict
         except FileNotFoundError:
             print(f"Error: File not found at {self.file_path}")
-            return []
+            return None
         except json.JSONDecodeError:
             print(f"Error: Invalid JSON format in file {self.file_path}")
-            return []
+            return None
         except Exception as e:
             print(f"Error parsing JMDict file: {str(e)}")
-            return []
+            return None
     
     def get_metadata(self) -> Dict:
         """

@@ -36,7 +36,7 @@ class Kanjidic2Parser:
         self.file_path = file_path
         self.kanjidic2 = None
     
-    def parse(self, show_progress: bool = True) -> List[Kanjidic2Character]:
+    def parse(self, show_progress: bool = True) -> Kanjidic2:
         """
         Parse the Kanjidic2 JSON file into a Kanjidic2 object.
         
@@ -45,22 +45,22 @@ class Kanjidic2Parser:
                 Defaults to True.
         
         Returns:
-            List[Kanjidic2Character]: List of parsed kanji character entries.
+            Kanjidic2: The parsed Kanjidic2 object containing metadata and characters.
         """
         try:
             with open(self.file_path, 'r', encoding='utf-8') as file:
                 kanjidic2_data = json.load(file)
                 self.kanjidic2 = Kanjidic2(kanjidic2_data, show_progress=show_progress)
-                return self.kanjidic2.characters
+                return self.kanjidic2
         except FileNotFoundError:
             print(f"Error: File not found at {self.file_path}")
-            return []
+            return None
         except json.JSONDecodeError:
             print(f"Error: Invalid JSON format in {self.file_path}")
-            return []
+            return None
         except Exception as e:
             print(f"Error parsing Kanjidic2 file: {str(e)}")
-            return []
+            return None
     
     def get_metadata(self) -> Dict:
         """
